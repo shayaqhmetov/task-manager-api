@@ -1,9 +1,10 @@
 import { v4 as uuid } from 'uuid';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { Injectable } from '@nestjs/common';
 import { Task, TaskStatus } from './tasks.model';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTaskFilterDto } from './dto/get-tasks-filter.dto';
+import { ERROR_MESSAGE } from '../constants';
 
 @Injectable()
 export class TasksProvider {
@@ -63,6 +64,10 @@ export class TasksProvider {
    * @returns {Task}
    */
   public getTaskById(id: string) {
+    const foundedTask = this.tasks.find((task) => task.id === id);
+    if (!foundedTask) {
+      throw new NotFoundException(ERROR_MESSAGE.TASK_NOT_FOUND(id));
+    }
     return this.tasks.find((task) => task.id === id);
   }
 
@@ -84,9 +89,6 @@ export class TasksProvider {
    * @returns {Task}
    */
   public updateTaskStatus(id: string, status: TaskStatus) {
-    if (TaskStatus[status] === undefined) {
-      throw new Error('Invalid status');
-    }
     const task = this.getTaskById(id);
     task.status = status;
     this.tasks = this.tasks.map((task) => {
