@@ -20,10 +20,4 @@ export class AuthController {
   ): Promise<{ accessToken: string }> {
     return this.authProvider.signIn(userCredetials);
   }
-
-  @Post('/test')
-  @UseGuards(AuthGuard())
-  public test(@Req() request) {
-    return request.user;
-  }
 }
